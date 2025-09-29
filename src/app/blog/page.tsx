@@ -7,7 +7,8 @@ import matter from 'gray-matter';
 interface Post {
   slug: string;
   frontmatter: {
-    [key: string]: any;
+    title: string;
+    date: string;
   };
 }
 
