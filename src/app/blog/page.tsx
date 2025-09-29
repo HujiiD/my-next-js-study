@@ -28,11 +28,11 @@ const getPosts = (): Post[] => {
     const fileContents = fs.readFileSync(fullPath, 'utf8');
 
     // gray-matterでfront-matterをパース
-    const { data } = matter(fileContents);
+    const { data: frontmatter } = matter(fileContents) as { data: { title: string; date: string } };
 
     return {
       slug,
-      frontmatter: data,
+      frontmatter,
     };
   });
 
