@@ -47,7 +47,6 @@ const getPosts = (): Post[] => {
   });
 };
 
-
 // ブログ一覧ページのコンポーネント
 export default function BlogPage() {
   const posts = getPosts();
