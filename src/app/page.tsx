@@ -1,96 +1,30 @@
-import Link from 'next/link';
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import type { Metadata } from 'next';
-import Image from 'next/image';
-
-// SEO対策：ページのメタデータを設定
-export const metadata: Metadata = {
-  title: '旅行記ブログ | My Travel Blog',
-  description: '東南アジアや様々な国での旅行の記録を共有するブログです。',
-};
-
-// Postの型定義を修正
-interface Post {
-  slug: string;
-  frontmatter: {
-    title: string;
-    date: string;
-    thumbnailUrl?: string; // 修正点1
-  };
-}
-
-const getPosts = (): Post[] => {
-  const postsDirectory = path.join(process.cwd(), 'posts');
-  const fileNames = fs.readdirSync(postsDirectory);
-
-  const posts = fileNames.map((fileName) => {
-    const slug = fileName.replace(/\.md$/, '');
-    const fullPath = path.join(postsDirectory, fileName);
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
-    const matterResult = matter(fileContents);
-    
-    // thumbnailUrlを読み込むように修正
-    return {
-      slug,
-      frontmatter: {
-        title: matterResult.data.title,
-        date: matterResult.data.date,
-        thumbnailUrl: matterResult.data.thumbnailUrl, // 修正点2
-      },
-    };
-  });
-
-  return posts.sort((a, b) => {
-    return new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime();
-  });
-};
+// StatCardコンポーネントを別途作成すると管理が楽になります
+const StatCard = ({ title, value, description }: { title: string; value: string; description: string }) => (
+  <div className="bg-[rgba(255,255,255,0.03)] border border-[var(--border-color)] rounded-lg p-6">
+    <h3 className="text-sm font-medium text-gray-400">{title}</h3>
+    <p className="text-4xl font-bold font-mono mt-2">{value}</p>
+    <p className="text-xs text-gray-500 mt-1">{description}</p>
+  </div>
+);
 
 export default function HomePage() {
-  const posts = getPosts();
-
   return (
-    <main className="container mx-auto px-4 py-8">
-      <header className="text-center mb-12">
-        <h1 className="text-5xl font-extrabold tracking-tight mb-2">旅行記ブログ</h1>
-        <p className="text-gray-500">東南アジアを中心に旅した記録。</p>
-      </header>
-      
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {posts.map((post) => (
-          <article key={post.slug} className="border rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 group">
-            
-            {/* --- サムネイル表示部分 --- */}
-            {post.frontmatter.thumbnailUrl && (
-              <div className="relative h-56 w-full">
-                <Link href={`/blog/${post.slug}`}>
-                  <Image
-                    src={post.frontmatter.thumbnailUrl}
-                    alt={post.frontmatter.title}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    className="group-hover:scale-105 transition-transform duration-300"
-                  />
-                </Link>
-              </div>
-            )}
-            {/* --- ここまで --- */}
-            
-            <div className="p-6">
-              <p className="text-sm text-gray-500 mb-2">{post.frontmatter.date}</p>
-              <h2 className="text-2xl font-bold mb-4">
-                <Link href={`/blog/${post.slug}`} className="text-gray-900 hover:text-blue-600 transition-colors">
-                  {post.frontmatter.title}
-                </Link>
-              </h2>
-              <Link href={`/blog/${post.slug}`} className="font-semibold text-blue-600 hover:underline">
-                続きを読む →
-              </Link>
-            </div>
-          </article>
-        ))}
+    <div>
+      <h2 className="text-3xl font-bold mb-6">Dashboard</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard title="訪問国数" value="15" description="アジア、ヨーロッパ" />
+        <StatCard title="旅の日数" value="289" description="2024年1月1日から" />
+        <StatCard title="総消費予算 (USD)" value="$8,540" description="予算達成率 95%" />
+        <StatCard title="総節約額 (USD)" value="$1,230" description="前月比 +$150" />
       </div>
-    </main>
+
+      <div className="mt-12">
+        <h3 className="text-2xl font-bold mb-4">最新の記事</h3>
+        {/* ここに最新記事の一覧を表示するロジックを追加 */}
+        <div className="p-4 border border-[var(--border-color)] rounded-lg">
+          <p className="text-gray-500">最新記事はまだありません。</p>
+        </div>
+      </div>
+    </div>
   );
 }
